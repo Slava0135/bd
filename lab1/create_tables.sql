@@ -62,4 +62,8 @@ CREATE TABLE IF NOT EXISTS public.tickets (
     wagon_number integer NOT NULL CHECK (wagon_number > 0),
     seat integer NOT NULL CHECK (seat > 0),
     price_paid decimal NOT NULL CHECK (price_paid > 0)
+    CONSTRAINT valid_transfer CHECK (
+        departure_station != destination_station
+        AND departure_time < destination_time
+    )
 );
