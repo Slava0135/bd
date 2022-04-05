@@ -12,7 +12,7 @@ INSERT INTO public.orders (creation_time, email, phone_number)
 VALUES ('2011-01-08 04:05:06', 'example@mail.ru', NULL),
     ('2011-01-13 10:23:54', 'test@gmail.com', '666');
 INSERT INTO public.routes (name, first_station, last_station)
-VALUES ('A-C', 'A', 'D'),
+VALUES ('A-C', 'A', 'C'),
     ('K-L', 'K', 'L');
 INSERT INTO public.route_sections (
         route_id,
@@ -33,11 +33,11 @@ VALUES ('common', 32, 1.0),
 INSERT INTO public.trains (route_id, length, departure_date)
 VALUES (1, 3, '2011-01-30'),
     (1, 1, '2011-01-31');
-INSERT INTO public.train_wagons (train_id, wagon_id, position_in_train)
-VALUES (1, 3, 1),
-    (1, 1, 2),
-    (1, 4, 3),
-    (2, 3, 1);
+INSERT INTO public.train_wagons (train_id, position_in_train, wagon_id)
+VALUES (1, 1, 3),
+    (1, 2, 1),
+    (1, 3, 4),
+    (2, 1, 3);
 INSERT INTO public.tickets (
         train_id,
         order_id,
