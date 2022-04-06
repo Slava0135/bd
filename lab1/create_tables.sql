@@ -19,6 +19,12 @@ CREATE TABLE IF NOT EXISTS public.routes (
     last_station varchar(50) NOT NULL CHECK (last_station != ''),
     CONSTRAINT valid_route CHECK (first_station != last_station)
 );
+/* 
+ Для хранения времени отправления/прибытия используется interval, так как поезд может идти несколько дней.
+ Началом отсчета является 00:00 дня отправления.
+ Кроме того таким образом можно удобно сформировать timestamp времени отправления/прибытия для билетов, 
+ достаточно прибавить дату отправления состава.
+ */
 CREATE TABLE IF NOT EXISTS public.route_sections (
     id serial PRIMARY KEY,
     route_id integer REFERENCES routes NOT NULL,
@@ -61,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.tickets (
     destination_time timestamp NOT NULL,
     wagon_number integer NOT NULL CHECK (wagon_number > 0),
     seat integer NOT NULL CHECK (seat > 0),
-    price_paid decimal NOT NULL CHECK (price_paid > 0)
+    price_paid decimal NOT NULL CHECK (price_paid > 0),
     CONSTRAINT valid_transfer CHECK (
         departure_station != destination_station
         AND departure_time < destination_time
