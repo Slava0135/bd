@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS public.trains (
 CREATE TABLE IF NOT EXISTS public.train_wagons (
     train_id integer REFERENCES trains,
     position_in_train integer CHECK (position_in_train > 0),
-    wagon_id integer REFERENCES wagon_classes,
+    wagon_class_id integer REFERENCES wagon_classes NOT NULL,
     PRIMARY KEY (train_id, position_in_train)
 );
 CREATE TABLE IF NOT EXISTS public.tickets (
