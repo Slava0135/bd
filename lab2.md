@@ -23,7 +23,7 @@
 
 ### Метод генерации
 
->Я сделал небольшое изменение полей в [скрипте](lab1/update_tables.sql) из первой работы, в таблицах **Ticket** и **RouteSections** departure_station и destination_station теперь называются departure_station_id и destination_station_id соответственно. Аналогично для first_station и last_station из **Route**.
+>Я сделал небольшое изменение полей в [скрипте](lab1/update_tables.sql) из первой работы, в таблицах **Ticket** и **RouteSections** departure_station и destination_station теперь называются departure_station_id и destination_station_id соответственно. Аналогично для first_station и last_station из **Route**. И еще я переименовал wagon_id на wagon_class_id в **TrainWagons**.
 
 В порядке генерации:
 
