@@ -33,7 +33,7 @@ VALUES ('common', 32, 1.0),
 INSERT INTO public.trains (route_id, length, departure_date)
 VALUES (1, 3, '2011-01-30'),
     (1, 1, '2011-01-31');
-INSERT INTO public.train_wagons (train_id, position_in_train, wagon_id)
+INSERT INTO public.train_wagons (train_id, position_in_train, wagon_class_id)
 VALUES (1, 1, 3),
     (1, 2, 1),
     (1, 3, 4),
