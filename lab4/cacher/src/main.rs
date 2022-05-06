@@ -1,5 +1,7 @@
 use postgres::{Client, NoTls, Error};
 
+mod cache;
+
 fn main() -> Result<(), Error> {
     let mut client = Client::connect("host=localhost user=postgres dbname=railway", NoTls)?;
     for row in client.query("SELECT * FROM stations", &[])? {
