@@ -8,7 +8,7 @@ use self::cache::QueryCache;
 
 mod cache;
 
-pub fn run(
+pub fn run_cached(
     mut client: Client,
     request_rx: Receiver<Request>,
     response_tx: Sender<String>,

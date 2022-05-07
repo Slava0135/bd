@@ -1,6 +1,6 @@
 use std::{sync::mpsc::channel, thread};
 
-use handler::run;
+use handler::run_cached;
 use postgres::{Client, NoTls, Error};
 
 use crate::requests::random_select;
@@ -15,7 +15,7 @@ fn main() -> Result<(), Error> {
     let (response_tx, response_rx) = channel();
 
     thread::spawn(move || {
-        run(client, request_rx, response_tx, 8);
+        run_cached(client, request_rx, response_tx, 8);
     });
 
     request_tx.send(random_select());

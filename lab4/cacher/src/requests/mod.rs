@@ -29,14 +29,14 @@ pub fn row_to_string(row: &Row, result_type: &Entity) -> String {
             let latitude: f32 = row.get(2);
             let longitude: f32 = row.get(3);
             format!("{id} {name} {latitude} {longitude}")
-        },
+        }
         Entity::Route => {
             let id: i32 = row.get(0);
             let name: String = row.get(1);
             let first_station_id: i32 = row.get(2);
             let last_station_id: i32 = row.get(3);
             format!("{id} {name} {first_station_id} {last_station_id}")
-        },
+        }
         Entity::RouteSection => {
             let id: i32 = row.get(0);
             let route_id: i32 = row.get(1);
@@ -44,22 +44,19 @@ pub fn row_to_string(row: &Row, result_type: &Entity) -> String {
             let departure_station_id: i32 = row.get(5);
             let destination_station_id: i32 = row.get(6);
             format!("{id} {route_id} {departure_station_id} {destination_station_id} {cost}")
-        },
+        }
     }
 }
 
 pub fn random_select() -> Request {
     let mut rng = rand::thread_rng();
-    match rng.gen_range(0..3) {
-        0 => {
-            select_all_routes()
-        }
-        1 => {
-            select_all_route_sections()
-        }
-        _ => {
-            select_all_stations()
-        }
+    match rng.gen_range(0..6) {
+        0 => select_all_routes(),
+        1 => select_all_route_sections(),
+        2 => select_stations_with_whitespace(),
+        3 => select_routes_with_latitude_in_range(),
+        4 => select_route_sections_with_cost_in_range(),
+        _ => select_all_stations(),
     }
 }
 
@@ -83,6 +80,34 @@ fn select_all_route_sections() -> Request {
     Request {
         tables: vec!["route_sections".to_string()],
         statement: Statement::Select("SELECT * FROM route_sections".to_string()),
+        entity: Some(Entity::RouteSection),
+    }
+}
+
+fn select_stations_with_whitespace() -> Request {
+    Request {
+        tables: vec!["stations".to_string()],
+        statement: Statement::Select("SELECT * FROM stations WHERE name LIKE '% %';".to_string()),
+        entity: Some(Entity::Station),
+    }
+}
+
+fn select_routes_with_latitude_in_range() -> Request {
+    let mut rng = rand::thread_rng();
+    let latitude = rng.gen_range(-10..=10);
+    Request {
+        tables: vec!["stations".to_string(), "routes".to_string()],
+        statement: Statement::Select(format!("SELECT * FROM routes WHERE routes.first_station_id IN ( SELECT stations.id FROM stations WHERE latitude > {latitude} )")),
+        entity: Some(Entity::Route),
+    }
+}
+
+fn select_route_sections_with_cost_in_range() -> Request {
+    let mut rng = rand::thread_rng();
+    let cost: i32 = rng.gen_range(0..10) * 100;
+    Request {
+        tables: vec!["route_sections".to_string()],
+        statement: Statement::Select(format!("SELECT * FROM route_sections WHERE route_sections.cost > {cost}")),
         entity: Some(Entity::RouteSection),
     }
 }
