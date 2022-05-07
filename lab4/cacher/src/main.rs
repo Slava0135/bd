@@ -3,7 +3,7 @@ use std::{sync::mpsc::channel, thread};
 use handler::run_cached;
 use postgres::{Client, NoTls, Error};
 
-use crate::requests::random_select;
+use crate::requests::{random_select, random_update_or_delete};
 
 mod handler;
 mod requests;
@@ -21,6 +21,9 @@ fn main() -> Result<(), Error> {
     request_tx.send(random_select());
     let response = response_rx.recv().unwrap();
     println!("{response}");
-
+    request_tx.send(random_update_or_delete());
+    let response = response_rx.recv().unwrap();
+    println!("{response}");
+    
     return Ok(())
 }

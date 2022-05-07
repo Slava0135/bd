@@ -40,6 +40,9 @@ pub fn run_cached(
                             cache.invalidate_table(&table);
                         }
                     }
+                    response_tx.send(format!("Rows modified: {rows_modified}"));
+                } else {
+                    panic!("BAD REQUEST")
                 }
             }
             Statement::Delete(statement) => {
@@ -49,6 +52,9 @@ pub fn run_cached(
                             cache.invalidate_table(&table);
                         }
                     }
+                    response_tx.send(format!("Rows modified: {rows_modified}"));
+                } else {
+                    panic!("BAD REQUEST")
                 }
             }
         }

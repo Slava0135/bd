@@ -87,14 +87,14 @@ fn select_all_route_sections() -> Request {
 fn select_stations_with_whitespace() -> Request {
     Request {
         tables: vec!["stations".to_string()],
-        statement: Statement::Select("SELECT * FROM stations WHERE name LIKE '% %';".to_string()),
+        statement: Statement::Select("SELECT * FROM stations WHERE name LIKE '% %'".to_string()),
         entity: Some(Entity::Station),
     }
 }
 
 fn select_routes_with_latitude_in_range() -> Request {
     let mut rng = rand::thread_rng();
-    let latitude = rng.gen_range(-10..=10);
+    let latitude = rng.gen_range(-8..=8) * 10;
     Request {
         tables: vec!["stations".to_string(), "routes".to_string()],
         statement: Statement::Select(format!("SELECT * FROM routes WHERE routes.first_station_id IN ( SELECT stations.id FROM stations WHERE latitude > {latitude} )")),
@@ -109,5 +109,52 @@ fn select_route_sections_with_cost_in_range() -> Request {
         tables: vec!["route_sections".to_string()],
         statement: Statement::Select(format!("SELECT * FROM route_sections WHERE route_sections.cost > {cost}")),
         entity: Some(Entity::RouteSection),
+    }
+}
+
+pub fn random_update_or_delete() -> Request {
+    let mut rng = rand::thread_rng();
+    match rng.gen_range(0..3) {
+        0 => update_cost(),
+        1 => update_stations_location(),
+        _ => delete_unused_stations(),
+    }
+}
+
+fn update_cost() -> Request {
+    Request {
+        tables: vec!["route_sections".to_string()],
+        statement: Statement::Update("UPDATE route_sections SET cost = cost + 10".to_string()),
+        entity: None,
+    }
+}
+
+fn update_stations_location() -> Request {
+    Request {
+        tables: vec!["stations".to_string()],
+        statement: Statement::Update("UPDATE stations SET longitude = -longitude".to_string()),
+        entity: None,
+    }
+}
+
+fn delete_unused_stations() -> Request {
+    Request {
+        tables: vec!["stations".to_string()],
+        statement: Statement::Delete("
+                DELETE FROM stations
+                WHERE id NOT IN (
+                SELECT (departure_station_id)
+                FROM route_sections
+                UNION
+                SELECT (destination_station_id)
+                FROM route_sections
+                UNION
+                SELECT (first_station_id)
+                FROM routes
+                UNION
+                SELECT (last_station_id)
+                FROM routes
+            )".to_string()),
+        entity: None,
     }
 }
