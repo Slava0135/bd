@@ -1,6 +1,7 @@
 use std::vec;
 
 use postgres::Row;
+use rand::Rng;
 
 pub enum Entity {
     Station,
@@ -48,7 +49,18 @@ pub fn row_to_string(row: &Row, result_type: &Entity) -> String {
 }
 
 pub fn random_select() -> Request {
-    select_all_stations()
+    let mut rng = rand::thread_rng();
+    match rng.gen_range(0..3) {
+        0 => {
+            select_all_routes()
+        }
+        1 => {
+            select_all_route_sections()
+        }
+        _ => {
+            select_all_stations()
+        }
+    }
 }
 
 fn select_all_stations() -> Request {
@@ -56,5 +68,21 @@ fn select_all_stations() -> Request {
         tables: vec!["stations".to_string()],
         statement: Statement::Select("SELECT * FROM stations".to_string()),
         entity: Some(Entity::Station),
+    }
+}
+
+fn select_all_routes() -> Request {
+    Request {
+        tables: vec!["routes".to_string()],
+        statement: Statement::Select("SELECT * FROM routes".to_string()),
+        entity: Some(Entity::Route),
+    }
+}
+
+fn select_all_route_sections() -> Request {
+    Request {
+        tables: vec!["route_sections".to_string()],
+        statement: Statement::Select("SELECT * FROM route_sections".to_string()),
+        entity: Some(Entity::RouteSection),
     }
 }

@@ -2,7 +2,8 @@ use std::{sync::mpsc::channel, thread};
 
 use handler::run;
 use postgres::{Client, NoTls, Error};
-use requests::random_select;
+
+use crate::requests::random_select;
 
 mod handler;
 mod requests;
