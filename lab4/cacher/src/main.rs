@@ -1,6 +1,6 @@
 use postgres::{Client, NoTls, Error};
 
-mod cache;
+mod handler;
 
 fn main() -> Result<(), Error> {
     let mut client = Client::connect("host=localhost user=postgres dbname=railway", NoTls)?;
