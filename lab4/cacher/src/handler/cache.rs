@@ -29,12 +29,12 @@ impl QueryCache {
         self.storage.push(query, data);
     }
 
-    pub fn get_entry(&mut self, query: Query) -> Option<&Data> {
-        self.storage.get(&query)
+    pub fn get_entry(&mut self, query: &Query) -> Option<&Data> {
+        self.storage.get(query)
     }
 
-    pub fn invalidate_table(&mut self, table: Table) {
-        if let Some(v) = self.related_queries.get_mut(&table) {
+    pub fn invalidate_table(&mut self, table: &Table) {
+        if let Some(v) = self.related_queries.get_mut(table) {
             for q in v.iter() {
                 self.storage.pop(q);
             }
@@ -59,15 +59,15 @@ mod tests {
         query_cache.add_entry(query_1.clone(), data_1.clone(), vec![]);
         query_cache.add_entry(query_2.clone(), data_2.clone(), vec![]);
         query_cache.add_entry(query_3.clone(), data_3.clone(), vec![]);
-        assert_eq!(query_cache.get_entry(query_2.clone()), Some(&data_2));
-        assert_eq!(query_cache.get_entry(query_1.clone()), Some(&data_1));
-        assert_eq!(query_cache.get_entry(query_3.clone()), Some(&data_3));
+        assert_eq!(query_cache.get_entry(&query_2), Some(&data_2));
+        assert_eq!(query_cache.get_entry(&query_1), Some(&data_1));
+        assert_eq!(query_cache.get_entry(&query_3), Some(&data_3));
 
         query_cache.add_entry(query_4.clone(), data_4.clone(), vec![]);
-        assert_eq!(query_cache.get_entry(query_2.clone()), None);
-        assert_eq!(query_cache.get_entry(query_1.clone()), Some(&data_1));
-        assert_eq!(query_cache.get_entry(query_3.clone()), Some(&data_3));
-        assert_eq!(query_cache.get_entry(query_4.clone()), Some(&data_4));
+        assert_eq!(query_cache.get_entry(&query_2), None);
+        assert_eq!(query_cache.get_entry(&query_1), Some(&data_1));
+        assert_eq!(query_cache.get_entry(&query_3), Some(&data_3));
+        assert_eq!(query_cache.get_entry(&query_4), Some(&data_4));
     }
 
     #[test]
@@ -93,27 +93,27 @@ mod tests {
             data_4.clone(),
             vec![tables[3].clone(), tables[0].clone()],
         );
-        assert_eq!(query_cache.get_entry(query_1.clone()), Some(&data_1));
-        assert_eq!(query_cache.get_entry(query_2.clone()), Some(&data_2));
-        assert_eq!(query_cache.get_entry(query_3.clone()), Some(&data_3));
-        assert_eq!(query_cache.get_entry(query_4.clone()), Some(&data_4));
+        assert_eq!(query_cache.get_entry(&query_1), Some(&data_1));
+        assert_eq!(query_cache.get_entry(&query_2), Some(&data_2));
+        assert_eq!(query_cache.get_entry(&query_3), Some(&data_3));
+        assert_eq!(query_cache.get_entry(&query_4), Some(&data_4));
 
-        query_cache.invalidate_table(tables[1].clone());
-        assert_eq!(query_cache.get_entry(query_1.clone()), Some(&data_1));
-        assert_eq!(query_cache.get_entry(query_2.clone()), None);
-        assert_eq!(query_cache.get_entry(query_3.clone()), Some(&data_3));
-        assert_eq!(query_cache.get_entry(query_4.clone()), Some(&data_4));
+        query_cache.invalidate_table(&tables[1]);
+        assert_eq!(query_cache.get_entry(&query_1), Some(&data_1));
+        assert_eq!(query_cache.get_entry(&query_2), None);
+        assert_eq!(query_cache.get_entry(&query_3), Some(&data_3));
+        assert_eq!(query_cache.get_entry(&query_4), Some(&data_4));
 
-        query_cache.invalidate_table(tables[0].clone());
-        assert_eq!(query_cache.get_entry(query_1.clone()), None);
-        assert_eq!(query_cache.get_entry(query_2.clone()), None);
-        assert_eq!(query_cache.get_entry(query_3.clone()), Some(&data_3));
-        assert_eq!(query_cache.get_entry(query_4.clone()), None);
+        query_cache.invalidate_table(&tables[0]);
+        assert_eq!(query_cache.get_entry(&query_1), None);
+        assert_eq!(query_cache.get_entry(&query_2), None);
+        assert_eq!(query_cache.get_entry(&query_3), Some(&data_3));
+        assert_eq!(query_cache.get_entry(&query_4), None);
 
-        query_cache.invalidate_table(tables[3].clone());
-        assert_eq!(query_cache.get_entry(query_1.clone()), None);
-        assert_eq!(query_cache.get_entry(query_2.clone()), None);
-        assert_eq!(query_cache.get_entry(query_3.clone()), Some(&data_3));
-        assert_eq!(query_cache.get_entry(query_4.clone()), None);
+        query_cache.invalidate_table(&tables[3]);
+        assert_eq!(query_cache.get_entry(&query_1), None);
+        assert_eq!(query_cache.get_entry(&query_2), None);
+        assert_eq!(query_cache.get_entry(&query_3), Some(&data_3));
+        assert_eq!(query_cache.get_entry(&query_4), None);
     }
 }
