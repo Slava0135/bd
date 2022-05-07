@@ -88,11 +88,7 @@ mod tests {
         query_cache.add_entry(query_1.clone(), data_1.clone(), vec![tables[0].clone()]);
         query_cache.add_entry(query_2.clone(), data_2.clone(), vec![tables[1].clone()]);
         query_cache.add_entry(query_3.clone(), data_3.clone(), vec![tables[2].clone()]);
-        query_cache.add_entry(
-            query_4.clone(),
-            data_4.clone(),
-            vec![tables[3].clone(), tables[0].clone()],
-        );
+        query_cache.add_entry(query_4.clone(), data_4.clone(), vec![tables[3].clone(), tables[0].clone()],);
         assert_eq!(query_cache.get_entry(&query_1), Some(&data_1));
         assert_eq!(query_cache.get_entry(&query_2), Some(&data_2));
         assert_eq!(query_cache.get_entry(&query_3), Some(&data_3));
