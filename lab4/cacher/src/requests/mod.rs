@@ -16,6 +16,7 @@ pub enum Statement {
 }
 
 pub struct Request {
+    pub name: &'static str,
     pub tables: Vec<String>,
     pub statement: Statement,
     pub entity: Option<Entity>,
@@ -50,18 +51,18 @@ pub fn row_to_string(row: &Row, result_type: &Entity) -> String {
 
 pub fn random_select() -> Request {
     let mut rng = rand::thread_rng();
-    match rng.gen_range(0..6) {
+    match rng.gen_range(0..5) {
         0 => select_all_routes(),
         1 => select_all_route_sections(),
-        2 => select_stations_with_whitespace(),
-        3 => select_routes_with_latitude_in_range(),
-        4 => select_route_sections_with_cost_in_range(),
+        2 => select_routes_with_latitude_more_than(),
+        3 => select_route_sections_with_cost_more_than(),
         _ => select_all_stations(),
     }
 }
 
 fn select_all_stations() -> Request {
     Request {
+        name: "Select all stations",
         tables: vec!["stations".to_string()],
         statement: Statement::Select("SELECT * FROM stations".to_string()),
         entity: Some(Entity::Station),
@@ -70,6 +71,7 @@ fn select_all_stations() -> Request {
 
 fn select_all_routes() -> Request {
     Request {
+        name: "Select all routes",
         tables: vec!["routes".to_string()],
         statement: Statement::Select("SELECT * FROM routes".to_string()),
         entity: Some(Entity::Route),
@@ -78,34 +80,29 @@ fn select_all_routes() -> Request {
 
 fn select_all_route_sections() -> Request {
     Request {
+        name: "Select all route sections",
         tables: vec!["route_sections".to_string()],
         statement: Statement::Select("SELECT * FROM route_sections".to_string()),
         entity: Some(Entity::RouteSection),
     }
 }
 
-fn select_stations_with_whitespace() -> Request {
-    Request {
-        tables: vec!["stations".to_string()],
-        statement: Statement::Select("SELECT * FROM stations WHERE name LIKE '% %'".to_string()),
-        entity: Some(Entity::Station),
-    }
-}
-
-fn select_routes_with_latitude_in_range() -> Request {
+fn select_routes_with_latitude_more_than() -> Request {
     let mut rng = rand::thread_rng();
     let latitude = rng.gen_range(-8..=8) * 10;
     Request {
+        name: "Select routes with latitude more than",
         tables: vec!["stations".to_string(), "routes".to_string()],
         statement: Statement::Select(format!("SELECT * FROM routes WHERE routes.first_station_id IN ( SELECT stations.id FROM stations WHERE latitude > {latitude} )")),
         entity: Some(Entity::Route),
     }
 }
 
-fn select_route_sections_with_cost_in_range() -> Request {
+fn select_route_sections_with_cost_more_than() -> Request {
     let mut rng = rand::thread_rng();
     let cost: i32 = rng.gen_range(0..10) * 100;
     Request {
+        name: "Select route sections with cost more than",
         tables: vec!["route_sections".to_string()],
         statement: Statement::Select(format!("SELECT * FROM route_sections WHERE route_sections.cost > {cost}")),
         entity: Some(Entity::RouteSection),
@@ -115,14 +112,15 @@ fn select_route_sections_with_cost_in_range() -> Request {
 pub fn random_update_or_delete() -> Request {
     let mut rng = rand::thread_rng();
     match rng.gen_range(0..3) {
-        0 => update_cost(),
+        0 => update_route_sections_cost(),
         1 => update_stations_location(),
         _ => delete_unused_stations(),
     }
 }
 
-fn update_cost() -> Request {
+fn update_route_sections_cost() -> Request {
     Request {
+        name: "Update route sections cost",
         tables: vec!["route_sections".to_string()],
         statement: Statement::Update("UPDATE route_sections SET cost = cost + 10".to_string()),
         entity: None,
@@ -131,6 +129,7 @@ fn update_cost() -> Request {
 
 fn update_stations_location() -> Request {
     Request {
+        name: "Update stations location",
         tables: vec!["stations".to_string()],
         statement: Statement::Update("UPDATE stations SET longitude = -longitude".to_string()),
         entity: None,
@@ -139,6 +138,7 @@ fn update_stations_location() -> Request {
 
 fn delete_unused_stations() -> Request {
     Request {
+        name: "Delete unused stations",
         tables: vec!["stations".to_string()],
         statement: Statement::Delete("
                 DELETE FROM stations
