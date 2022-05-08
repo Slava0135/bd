@@ -1,5 +1,7 @@
 use std::{sync::mpsc::channel, thread, time::{Instant, Duration}, collections::HashMap, cmp::{min, max}};
 
+use clap::Parser;
+
 use handler::{run_cached, run_uncached};
 use postgres::{Client, NoTls};
 use rand::Rng;
@@ -9,9 +11,26 @@ use crate::requests::{random_select, random_update_or_delete};
 mod handler;
 mod requests;
 
-const cache_cap: usize = 8;
-const select_chance: f32 = 0.8;
-const n_requests: i32 = 10000;
+// const cache_cap: usize = 8;
+// const select_chance: f32 = 0.1;
+// const n_requests: i32 = 10000;
+
+/// DB cacher
+#[derive(Parser, Debug, Clone)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    /// Cache Capacity
+    #[clap(short, long, default_value_t = 8)]
+    cache_cap: usize,
+
+    /// Controls Select/(Update & Delete) ratio - e.g. 0.1 means 10% of requests would be Select
+    #[clap(short, long, default_value_t = 0.1)]
+    select_chance: f32,
+    
+    /// Number of Iterations for testbench
+    #[clap(short, long, default_value_t = 10000)]
+    n_requests: i32,
+}
 
 struct RequestResults {
     min_time: Duration,
@@ -23,33 +42,34 @@ struct RequestResults {
 type Results = HashMap<String, RequestResults>;
 
 fn main() {
-    test_cached();
-    test_uncached();
+    let args = Args::parse();
+    test_cached(args.clone());
+    test_uncached(args.clone());
 }
 
-fn test_cached() {
+fn test_cached(args: Args) {
     
-    let results = test(true);
+    let results = test(true, args.clone());
 
     println!();
-    println!("Results (Cached) with: cache_cap = {cache_cap}, select_chance = {select_chance}, n_requests = {n_requests}");
+    println!("Results (Cached) with: cache_cap = {}, select_chance = {}, n_requests = {}", args.cache_cap, args.select_chance, args.n_requests);
     println!();
     
     print_results(results);
 }
 
-fn test_uncached() {
+fn test_uncached(args: Args) {
 
-    let results = test(false);
+    let results = test(false, args.clone());
 
     println!();
-    println!("Results (Uncached) with: select_chance = {select_chance}, n_requests = {n_requests}");
+    println!("Results (Uncached) with: select_chance = {}, n_requests = {}", args.select_chance, args.n_requests);
     println!();
 
     print_results(results);
 }
 
-fn test(cached: bool) -> Results {
+fn test(cached: bool, args: Args) -> Results {
     let client = Client::connect("host=localhost user=postgres dbname=railway", NoTls).unwrap();
 
     let (request_tx, request_rx) = channel();
@@ -57,7 +77,7 @@ fn test(cached: bool) -> Results {
 
     thread::spawn(move || {
         if cached {
-            run_cached(client, request_rx, response_tx, cache_cap);
+            run_cached(client, request_rx, response_tx, args.cache_cap);
         } else {
             run_uncached(client, request_rx, response_tx);
         }
@@ -65,8 +85,8 @@ fn test(cached: bool) -> Results {
 
     let mut rng = rand::thread_rng();
     let mut results: Results = HashMap::new();
-    for i in 0..n_requests {
-        let request = if rng.gen_range(0.0..1.0) > select_chance {
+    for i in 0..args.n_requests {
+        let request = if rng.gen_range(0.0..1.0) > args.select_chance {
             random_update_or_delete()
         } else {
             random_select()
