@@ -60,3 +60,40 @@ pub fn run_cached(
         }
     }
 }
+
+pub fn run_uncached(
+    mut client: Client,
+    request_rx: Receiver<Request>,
+    response_tx: Sender<String>,
+) {
+    for request in request_rx {
+        match request.statement {
+            Statement::Select(statement) => {
+                if let Ok(entry) = client.query(&statement, &[]) {
+                    let entry: Vec<String> = entry
+                        .iter()
+                        .map(|elem| row_to_string(elem, request.entity.as_ref().unwrap()))
+                        .collect();
+                    let entry = entry.join("\n");
+                    response_tx.send(entry);
+                } else {
+                    panic!("BAD REQUEST")
+                }
+            }
+            Statement::Update(statement) => {
+                if let Ok(rows_modified) = client.execute(&statement, &[]) {
+                    response_tx.send(format!("Rows modified: {rows_modified}"));
+                } else {
+                    panic!("BAD REQUEST")
+                }
+            }
+            Statement::Delete(statement) => {
+                if let Ok(rows_modified) = client.execute(&statement, &[]) {
+                    response_tx.send(format!("Rows modified: {rows_modified}"));
+                } else {
+                    panic!("BAD REQUEST")
+                }
+            }
+        }
+    }
+}
