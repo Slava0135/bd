@@ -27,6 +27,7 @@ pub fn run_cached(
                             .map(|elem| row_to_string(elem, request.entity.as_ref().unwrap()))
                             .collect();
                         let entry = entry.join("\n");
+                        cache.add_entry(statement, entry.clone(), request.tables);
                         response_tx.send(entry);
                     } else {
                         panic!("BAD REQUEST")

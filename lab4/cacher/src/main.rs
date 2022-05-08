@@ -11,24 +11,20 @@ use crate::requests::{random_select, random_update_or_delete};
 mod handler;
 mod requests;
 
-// const cache_cap: usize = 8;
-// const select_chance: f32 = 0.1;
-// const n_requests: i32 = 10000;
-
 /// DB cacher
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
     /// Cache Capacity
-    #[clap(short, long, default_value_t = 8)]
+    #[clap(short, long, default_value_t = 16)]
     cache_cap: usize,
 
-    /// Controls Select/(Update & Delete) ratio - e.g. 0.1 means 10% of requests would be Select
-    #[clap(short, long, default_value_t = 0.1)]
+    /// Controls Select/(Update & Delete) ratio - e.g. 0.95 means 95% of requests would be Select
+    #[clap(short, long, default_value_t = 0.95)]
     select_chance: f32,
     
     /// Number of Iterations for testbench
-    #[clap(short, long, default_value_t = 10000)]
+    #[clap(short, long, default_value_t = 1000)]
     n_requests: i32,
 }
 
