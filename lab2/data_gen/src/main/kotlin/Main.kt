@@ -136,7 +136,7 @@ fun generateFullRoutes(
             if (routeId != null) {
                 for (pair in slice.windowed(2)) {
                     val destinationTime =
-                        departureTime + DateTimePeriod(minutes = Random.nextInt(maxTravelMinutes))
+                        departureTime + DateTimePeriod(minutes = 1 + Random.nextInt(maxTravelMinutes))
                     val departureTimePG = PGInterval(0, 0, departureTime.hours / 24, departureTime.hours % 24, departureTime.minutes, .0)
                     val destinationTimePG = PGInterval(0, 0, destinationTime.hours / 24, destinationTime.hours % 24, destinationTime.minutes, .0)
                     exec(
