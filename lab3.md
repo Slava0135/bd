@@ -214,6 +214,30 @@ WHERE id NOT IN (
 2. Написать хранимую процедуру/функцию, которая вычисляет расстояние между двумя станциями (идентификаторы станций должны быть параметрами ХП).
 3. Используя ХП из пункта выше для вычисления расстояний между станциями, вывести топ-5 поездов с самыми длинными маршрутами.
 
+```sql
+-- Выводит количество пассажиров, перевезенных вагонами каждого класса, за последний месяц и общую сумму, вырученную с билетов, которые были куплены этими группами пассажиров.
+SELECT r.wagon_class_id,
+    count(r.id) as passengers,
+    sum(r.price_paid) as total_price
+FROM (
+        (
+            SELECT *
+            FROM tickets
+            WHERE (
+                    departure_time > (CURRENT_DATE - INTERVAL '1 month')
+                    AND departure_time < CURRENT_DATE
+                )
+        ) as last_month_tickets
+        INNER JOIN train_wagons ON (
+            last_month_tickets.train_id = train_wagons.train_id
+            AND last_month_tickets.wagon_number = train_wagons.position_in_train
+        )
+    ) as r
+GROUP BY r.wagon_class_id;
+```
+
+![результаты](lab3/ind_1_results.png)
+
 ### Часть 4
 
 ## Выводы
