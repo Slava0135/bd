@@ -19,7 +19,7 @@ BEGIN
     FROM stations 
     WHERE id = second_station_id;
 
-    IF lat1 = lat2 OR lon1 = lon2
+    IF lat1 = lat2 AND lon1 = lon2
         THEN RETURN dist;
     ELSE
         radlat1 = pi() * lat1 / 180;
